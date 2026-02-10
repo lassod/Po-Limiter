@@ -53,10 +53,9 @@ app_license = "MIT"
 # ----------
 
 # add methods and filters to jinja environment
-# jinja = {
-# 	"methods": "po.utils.jinja_methods",
-# 	"filters": "po.utils.jinja_filters"
-# }
+jinja = {
+	"methods": "po.po_limiter.utils.jinja_methods"
+}
 
 # Installation
 # ------------
@@ -69,6 +68,14 @@ app_license = "MIT"
 
 # before_uninstall = "po.uninstall.before_uninstall"
 # after_uninstall = "po.uninstall.after_uninstall"
+
+# Additional DocTypes to be installed
+# -----------------------------------
+
+doctype_list = [
+	"User PO Limit",
+	"PO Limit Increase Request"
+]
 
 # Integration Setup
 # ------------------
@@ -116,13 +123,16 @@ app_license = "MIT"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	"Purchase Order": {
+		"validate": "po.po_limiter.po_validation.validate_po_limits",
+		"on_submit": "po.po_limiter.po_validation.validate_po_limits",
+		"on_cancel": "po.po_limiter.po_validation.update_monthly_usage_on_po_cancel"
+	},
+	"User": {
+		"after_insert": "po.po_limiter.user_hooks.create_default_po_limit"
+	}
+}
 
 # Scheduled Tasks
 # ---------------

@@ -1,0 +1,104 @@
+{
+	"actions": [],
+	"creation": "2026-02-10 00:00:00.000000",
+	"doctype": "DocType",
+	"editable_grid": 1,
+	"engine": "InnoDB",
+	"field_order": [
+		"user",
+		"company",
+		"column_break_1",
+		"per_po_limit",
+		"per_month_limit",
+		"column_break_2",
+		"monthly_usage",
+		"last_reset_date"
+	],
+	"fields": [
+		{
+			"fieldname": "user",
+			"fieldtype": "Link",
+			"in_list_view": 1,
+			"label": "User",
+			"options": "User",
+			"reqd": 1
+		},
+		{
+			"fieldname": "company",
+			"fieldtype": "Link",
+			"in_list_view": 1,
+			"label": "Company",
+			"options": "Company",
+			"reqd": 1
+		},
+		{
+			"fieldname": "column_break_1",
+			"fieldtype": "Column Break"
+		},
+		{
+			"default": "0",
+			"fieldname": "per_po_limit",
+			"fieldtype": "Currency",
+			"in_list_view": 1,
+			"label": "Per PO Limit",
+			"options": "Company:company:default_currency"
+		},
+		{
+			"default": "0",
+			"fieldname": "per_month_limit",
+			"fieldtype": "Currency",
+			"in_list_view": 1,
+			"label": "Per Month Limit",
+			"options": "Company:company:default_currency"
+		},
+		{
+			"fieldname": "column_break_2",
+			"fieldtype": "Column Break"
+		},
+		{
+			"default": "0",
+			"fieldname": "monthly_usage",
+			"fieldtype": "Currency",
+			"label": "Monthly Usage",
+			"options": "Company:company:default_currency",
+			"read_only": 1
+		},
+		{
+			"fieldname": "last_reset_date",
+			"fieldtype": "Date",
+			"label": "Last Reset Date",
+			"read_only": 1
+		}
+	],
+	"istable": 0,
+	"links": [],
+	"modified": "2026-02-10 00:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "PO Limiter",
+	"name": "User PO Limit",
+	"owner": "Administrator",
+	"permissions": [
+		{
+			"create": 1,
+			"delete": 1,
+			"email": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "System Manager",
+			"share": 1,
+			"write": 1
+		},
+		{
+			"email": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "All",
+			"share": 1
+		}
+	],
+	"sort_field": "modified",
+	"sort_order": "DESC",
+	"states": []
+}
