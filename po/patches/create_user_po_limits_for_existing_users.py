@@ -42,6 +42,7 @@ def execute():
 						"doctype": "User PO Limit",
 						"user": user,
 						"company": company,
+						"status": "Revoked",
 						"per_po_limit": 0,
 						"per_month_limit": 0,
 						"monthly_usage": 0,

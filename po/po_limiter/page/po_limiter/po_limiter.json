@@ -1,0 +1,25 @@
+{
+	"content": null,
+	"creation": "2026-02-10 00:00:00.000000",
+	"docstatus": 0,
+	"doctype": "Page",
+	"idx": 0,
+	"modified": "2026-02-10 00:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "PO Limiter",
+	"name": "po_limiter",
+	"owner": "Administrator",
+	"page_name": "po_limiter",
+	"roles": [
+		{
+			"role": "Managing Director"
+		},
+		{
+			"role": "System Manager"
+		}
+	],
+	"script": "po.po_limiter.page.po_limiter.po_limiter",
+	"standard": "Yes",
+	"style": "/assets/po/css/po_limiter.css",
+	"title": "PO Limiter Tool"
+}

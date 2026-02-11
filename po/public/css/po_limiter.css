@@ -1,0 +1,117 @@
+/* Copyright (c) 2026, Lassod */
+/* License: MIT */
+
+.po-limiter-container {
+	padding: 20px;
+}
+
+.po-limiter-container .page-head {
+	margin-bottom: 30px;
+	border-bottom: 1px solid #d1d8dd;
+	padding-bottom: 15px;
+}
+
+.po-limiter-container .pending-requests-section {
+	margin-bottom: 30px;
+}
+
+.po-limiter-container .request-card {
+	border: 1px solid #d1d8dd;
+	border-radius: 4px;
+	padding: 15px;
+	margin-bottom: 15px;
+	background: #f7fafc;
+}
+
+.po-limiter-container .request-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+}
+
+.po-limiter-container .request-body p {
+	margin: 5px 0;
+}
+
+.po-limiter-container .request-actions {
+	margin-top: 15px;
+	padding-top: 10px;
+	border-top: 1px solid #d1d8dd;
+	display: flex;
+	gap: 10px;
+}
+
+.po-limiter-container .user-selection,
+.po-limiter-container .company-selection {
+	margin-bottom: 20px;
+	max-width: 500px;
+}
+
+.po-limiter-container .user-selection label,
+.po-limiter-container .company-selection label {
+	font-weight: 600;
+	display: block;
+	margin-bottom: 5px;
+}
+
+.po-limiter-container #limit-editor {
+	background: #f7fafc;
+	border: 1px solid #d1d8dd;
+	border-radius: 4px;
+	padding: 20px;
+	max-width: 500px;
+}
+
+.po-limiter-container .limit-form h3 {
+	margin-top: 0;
+	margin-bottom: 20px;
+	color: #36414c;
+}
+
+.po-limiter-container .limit-form .form-group {
+	margin-bottom: 15px;
+}
+
+.po-limiter-container .limit-form label {
+	font-weight: 600;
+	display: block;
+	margin-bottom: 5px;
+}
+
+.po-limiter-container .current-usage {
+	margin-top: 15px;
+	padding: 10px;
+	background: #e8f4f8;
+	border-left: 3px solid #00a65a;
+	border-radius: 3px;
+}
+
+.po-limiter-container .limit-form button {
+	margin-right: 10px;
+}
+
+.po-limiter-container .po-limiter-tabs {
+	margin-top: 30px;
+}
+
+.po-limiter-container .tab-content {
+	padding: 20px 0;
+}
+
+.po-limiter-container table.table {
+	background: white;
+}
+
+.po-limiter-container .label {
+	padding: 5px 10px;
+	font-size: 12px;
+}
+
+.po-limiter-container .label-success {
+	background-color: #00a65a;
+}
+
+.po-limiter-container .label-warning {
+	background-color: #f39c12;
+}

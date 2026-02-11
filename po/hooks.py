@@ -9,7 +9,7 @@ app_license = "MIT"
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/po/css/po.css"
+app_include_css = "/assets/po/css/po_limiter.css"
 # app_include_js = "/assets/po/js/po.js"
 
 # include js, css files in header of web template
@@ -31,6 +31,11 @@ app_license = "MIT"
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
+
+# Include PO Limiter client-side script for Purchase Order
+doctype_js = {
+	"Purchase Order": "po.po_limiter.purchase_order_client"
+}
 
 # Home Pages
 # ----------

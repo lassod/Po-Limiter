@@ -27,6 +27,7 @@ def create_default_po_limit(doc, method=None):
 				"doctype": "User PO Limit",
 				"user": doc.name,
 				"company": company,
+				"status": "Revoked",
 				"per_po_limit": 0,
 				"per_month_limit": 0,
 				"monthly_usage": 0,

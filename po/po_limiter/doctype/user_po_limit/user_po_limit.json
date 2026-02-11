@@ -1,104 +1,153 @@
 {
-	"actions": [],
-	"creation": "2026-02-10 00:00:00.000000",
-	"doctype": "DocType",
-	"editable_grid": 1,
-	"engine": "InnoDB",
-	"field_order": [
-		"user",
-		"company",
-		"column_break_1",
-		"per_po_limit",
-		"per_month_limit",
-		"column_break_2",
-		"monthly_usage",
-		"last_reset_date"
-	],
-	"fields": [
-		{
-			"fieldname": "user",
-			"fieldtype": "Link",
-			"in_list_view": 1,
-			"label": "User",
-			"options": "User",
-			"reqd": 1
-		},
-		{
-			"fieldname": "company",
-			"fieldtype": "Link",
-			"in_list_view": 1,
-			"label": "Company",
-			"options": "Company",
-			"reqd": 1
-		},
-		{
-			"fieldname": "column_break_1",
-			"fieldtype": "Column Break"
-		},
-		{
-			"default": "0",
-			"fieldname": "per_po_limit",
-			"fieldtype": "Currency",
-			"in_list_view": 1,
-			"label": "Per PO Limit",
-			"options": "Company:company:default_currency"
-		},
-		{
-			"default": "0",
-			"fieldname": "per_month_limit",
-			"fieldtype": "Currency",
-			"in_list_view": 1,
-			"label": "Per Month Limit",
-			"options": "Company:company:default_currency"
-		},
-		{
-			"fieldname": "column_break_2",
-			"fieldtype": "Column Break"
-		},
-		{
-			"default": "0",
-			"fieldname": "monthly_usage",
-			"fieldtype": "Currency",
-			"label": "Monthly Usage",
-			"options": "Company:company:default_currency",
-			"read_only": 1
-		},
-		{
-			"fieldname": "last_reset_date",
-			"fieldtype": "Date",
-			"label": "Last Reset Date",
-			"read_only": 1
-		}
-	],
-	"istable": 0,
-	"links": [],
-	"modified": "2026-02-10 00:00:00.000000",
-	"modified_by": "Administrator",
-	"module": "PO Limiter",
-	"name": "User PO Limit",
-	"owner": "Administrator",
-	"permissions": [
-		{
-			"create": 1,
-			"delete": 1,
-			"email": 1,
-			"print": 1,
-			"read": 1,
-			"report": 1,
-			"role": "System Manager",
-			"share": 1,
-			"write": 1
-		},
-		{
-			"email": 1,
-			"print": 1,
-			"read": 1,
-			"report": 1,
-			"role": "All",
-			"share": 1
-		}
-	],
-	"sort_field": "modified",
-	"sort_order": "DESC",
-	"states": []
+ "actions": [],
+ "creation": "2026-02-10 21:05:44.776944",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "user",
+  "company",
+  "status_section",
+  "status",
+  "column_break_1",
+  "limits_section",
+  "per_po_limit",
+  "per_month_limit",
+  "column_break_2",
+  "tracking_section",
+  "monthly_usage",
+  "last_reset_date",
+  "audit_section",
+  "last_updated_by",
+  "last_updated_date"
+ ],
+ "fields": [
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "User",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "status_section",
+   "fieldtype": "Column Break",
+   "label": "Status"
+  },
+  {
+   "default": "Revoked",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Active\nRevoked",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "limits_section",
+   "fieldtype": "Tab Break",
+   "label": "Submission Limits"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.status=='Active'",
+   "fieldname": "per_po_limit",
+   "fieldtype": "Currency",
+   "label": "Per PO Limit",
+   "options": "Company:company:default_currency"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.status=='Active'",
+   "fieldname": "per_month_limit",
+   "fieldtype": "Currency",
+   "label": "Per Month Limit",
+   "options": "Company:company:default_currency"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.status=='Active'",
+   "fieldname": "tracking_section",
+   "fieldtype": "Tab Break",
+   "label": "Usage Tracking"
+  },
+  {
+   "default": "0",
+   "fieldname": "monthly_usage",
+   "fieldtype": "Currency",
+   "label": "Monthly Usage",
+   "options": "Company:company:default_currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_reset_date",
+   "fieldtype": "Date",
+   "label": "Last Reset Date",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "audit_section",
+   "fieldtype": "Tab Break",
+   "label": "Audit Information"
+  },
+  {
+   "fieldname": "last_updated_by",
+   "fieldtype": "Link",
+   "label": "Last Updated By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_updated_date",
+   "fieldtype": "Datetime",
+   "label": "Last Updated Date",
+   "read_only": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-02-11 09:03:07.351094",
+ "modified_by": "Administrator",
+ "module": "PO Limiter",
+ "name": "User PO Limit",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
 }

@@ -7,8 +7,11 @@ from frappe.utils import flt, getdate, today
 
 def validate_po_limits(doc, method=None):
 	"""
-	Validate Purchase Order against user's PO limits.
+	Validate Purchase Order against current user's PO limits.
 	This is called from Purchase Order validate() and on_submit().
+
+	IMPORTANT: Only validates on SUBMIT, not on save as draft.
+	Users can always save POs as draft regardless of limits.
 
 	Args:
 		doc: Purchase Order document
@@ -18,8 +21,18 @@ def validate_po_limits(doc, method=None):
 	if doc.docstatus == 2:
 		return
 
-	# Get the owner (user who created the PO)
-	user = doc.owner
+	# Only validate on SUBMIT (docstatus == 1), not on save as draft (docstatus == 0)
+	# This allows users to save POs as draft without limits
+	if doc.docstatus == 0 and method != "on_submit":
+		# Document is being saved as draft - allow without validation
+		return
+
+	# Only validate when actually submitting (docstatus becomes 1)
+	if doc.docstatus != 1 and method != "on_submit":
+		return
+
+	# Get the current logged-in user (session user)
+	user = frappe.session.user
 
 	# Get company
 	company = doc.company
@@ -34,22 +47,24 @@ def validate_po_limits(doc, method=None):
 	user_limit = get_user_po_limit(user, company)
 
 	if not user_limit:
-		# No limit set - allow but warn (or you can throw error)
-		# frappe.msgprint(_("No PO limit set for user {0}. Please request a limit.").format(user))
-		return
+		# No limit set - block submission
+		frappe.throw(
+			_("PO submission requires MD approval. Please request a PO submission limit."),
+			title=_("PO Limit Restriction"),
+			exc=frappe.ValidationError
+		)
 
 	# Validate Per PO Limit
 	validate_per_po_limit(po_amount, user_limit, doc.name)
 
 	# Validate Per Month Limit (only on submit)
-	if method == "on_submit" or doc.docstatus == 1:
-		validate_per_month_limit(po_amount, user_limit, user, company, doc.name)
+	validate_per_month_limit(po_amount, user_limit, user, company, doc.name)
 
 def get_user_po_limit(user, company):
 	"""Get user's PO limit for the specified company"""
 	limits = frappe.db.get_value("User PO Limit",
 		{"user": user, "company": company},
-		["per_po_limit", "per_month_limit", "monthly_usage", "last_reset_date", "name"],
+		["per_po_limit", "per_month_limit", "monthly_usage", "last_reset_date", "name", "status"],
 		as_dict=1
 	)
 
@@ -57,43 +72,54 @@ def get_user_po_limit(user, company):
 
 def validate_per_po_limit(po_amount, user_limit, po_name):
 	"""Validate Per PO limit"""
+	# Check if status is Revoked
+	status = user_limit.get("status", "Revoked")
+
+	if status == "Revoked":
+		frappe.throw(
+			_("PO submission requires MD approval."),
+			title=_("PO Limit Restriction"),
+			exc=frappe.ValidationError
+		)
+
 	per_po_limit = flt(user_limit.get("per_po_limit", 0))
 
 	if per_po_limit <= 0:
 		frappe.throw(
-			_("<b>PO Limit Exceeded:</b> You have a zero Per PO limit. "
-			  "Please submit a <a href='/app/po-limit-increase-request'>PO Limit Increase Request</a> "
-			  "to request a limit increase before submitting Purchase Order <b>{0}</b>.").format(po_name),
+			_("PO submission requires MD approval."),
 			title=_("PO Limit Restriction"),
 			exc=frappe.ValidationError
 		)
 
 	if po_amount > per_po_limit:
 		frappe.throw(
-			_("<b>Per PO Limit Exceeded:</b> Purchase Order <b>{0}</b> amount ({1}) "
-			  "exceeds your Per PO limit of {2}. "
-			  "Please submit a <a href='/app/po-limit-increase-request'>PO Limit Increase Request</a> "
-			  "to request a limit increase.").format(
-				po_name,
-				fmt_money(po_amount),
-				fmt_money(per_po_limit)
-			  ),
+			_("PO Amount ({0}) exceeds your Per PO Limit ({1}). Excess: {2}. Please reduce the PO amount or request MD approval.").format(
+				frappe.format_value(po_amount, dict(fieldtype="Currency")),
+				frappe.format_value(per_po_limit, dict(fieldtype="Currency")),
+				frappe.format_value(po_amount - per_po_limit, dict(fieldtype="Currency"))
+			),
 			title=_("PO Limit Restriction"),
 			exc=frappe.ValidationError
 		)
 
 def validate_per_month_limit(po_amount, user_limit, user, company, po_name):
-	"""Validate Per Month limit"""
-	per_month_limit = flt(user_limit.get("per_month_limit", 0))
+	"""Validate Per Month limit - only if monthly limit is set (greater than 0)"""
+	# Check if status is Revoked
+	status = user_limit.get("status", "Revoked")
 
-	if per_month_limit <= 0:
+	if status == "Revoked":
 		frappe.throw(
-			_("<b>Monthly PO Limit Exceeded:</b> You have a zero Per Month limit. "
-			  "Please submit a <a href='/app/po-limit-increase-request'>PO Limit Increase Request</a> "
-			  "to request a limit increase before submitting Purchase Order <b>{0}</b>.").format(po_name),
-			title=_("Monthly PO Limit Restriction"),
+			_("PO submission requires MD approval."),
+			title=_("PO Limit Restriction"),
 			exc=frappe.ValidationError
 		)
+
+	per_month_limit = flt(user_limit.get("per_month_limit", 0))
+
+	# If monthly limit is 0 or not set, skip monthly validation
+	# This allows MD to set only Per PO limit without monthly restriction
+	if per_month_limit <= 0:
+		return
 
 	# Get current month's usage
 	monthly_usage = get_monthly_po_usage(user, company)
@@ -103,19 +129,13 @@ def validate_per_month_limit(po_amount, user_limit, user, company, po_name):
 
 	if total_with_current > per_month_limit:
 		frappe.throw(
-			_("<b>Monthly PO Limit Exceeded:</b> Submitting Purchase Order <b>{0}</b> ({1}) "
-			  "will exceed your monthly limit of {2}. "
-			  "Your current monthly usage is {3}. "
-			  "Total would be {4}. "
-			  "Please submit a <a href='/app/po-limit-increase-request'>PO Limit Increase Request</a> "
-			  "to request a limit increase.").format(
-				po_name,
-				fmt_money(po_amount),
-				fmt_money(per_month_limit),
-				fmt_money(monthly_usage),
-				fmt_money(total_with_current)
-			  ),
-			title=_("Monthly PO Limit Restriction"),
+			_("Monthly PO Amount ({0}) exceeds your Per Month Limit ({1}). Your current monthly usage: {2}. This PO: {3}. Please request MD approval.").format(
+				frappe.format_value(total_with_current, dict(fieldtype="Currency")),
+				frappe.format_value(per_month_limit, dict(fieldtype="Currency")),
+				frappe.format_value(monthly_usage, dict(fieldtype="Currency")),
+				frappe.format_value(po_amount, dict(fieldtype="Currency"))
+			),
+			title=_("PO Limit Restriction"),
 			exc=frappe.ValidationError
 		)
 
@@ -149,19 +169,16 @@ def update_monthly_usage(limit_name, new_usage):
 	"""Update the monthly_usage field in User PO Limit"""
 	frappe.db.set_value("User PO Limit", limit_name, "monthly_usage", new_usage)
 
-def fmt_money(amount):
-	"""Format money for display"""
-	return frappe.format_value(amount, dict(fieldtype="Currency"))
-
 def update_monthly_usage_on_po_cancel(doc, method=None):
 	"""
 	Update monthly usage when a PO is cancelled.
-	This subtracts the cancelled PO amount from monthly usage.
+	This subtracts the cancelled PO amount from the current user's monthly usage.
 	"""
 	if doc.docstatus != 2:  # Only on cancel
 		return
 
-	user = doc.owner
+	# Use the current logged-in user (session user)
+	user = frappe.session.user
 	company = doc.company
 	po_amount = flt(doc.base_grand_total)
 
@@ -173,3 +190,26 @@ def update_monthly_usage_on_po_cancel(doc, method=None):
 	new_usage = max(0, current_usage - po_amount)  # Ensure we don't go negative
 
 	update_monthly_usage(user_limit["name"], new_usage)
+
+
+@frappe.whitelist()
+def get_user_po_limit_status(user, company):
+	"""
+	Get user's PO limit status for client-side validation.
+	Returns status and limit information for the current user.
+	"""
+	limits = get_user_po_limit(user, company)
+
+	if not limits:
+		return {
+			"status": "Revoked",
+			"per_po_limit": 0,
+			"per_month_limit": 0
+		}
+
+	return {
+		"status": limits.get("status", "Revoked"),
+		"per_po_limit": limits.get("per_po_limit", 0),
+		"per_month_limit": limits.get("per_month_limit", 0)
+	}
+
