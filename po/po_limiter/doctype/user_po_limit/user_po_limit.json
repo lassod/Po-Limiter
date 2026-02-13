@@ -73,6 +73,7 @@
    "depends_on": "eval:doc.status=='Active'",
    "fieldname": "per_month_limit",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Per Month Limit",
    "options": "Company:company:default_currency"
   },
@@ -84,12 +85,14 @@
    "depends_on": "eval:doc.status=='Active'",
    "fieldname": "tracking_section",
    "fieldtype": "Tab Break",
+   "hidden": 1,
    "label": "Usage Tracking"
   },
   {
    "default": "0",
    "fieldname": "monthly_usage",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Monthly Usage",
    "options": "Company:company:default_currency",
    "read_only": 1
@@ -97,6 +100,7 @@
   {
    "fieldname": "last_reset_date",
    "fieldtype": "Date",
+   "hidden": 1,
    "label": "Last Reset Date",
    "read_only": 1
   },
@@ -121,7 +125,7 @@
   }
  ],
  "links": [],
- "modified": "2026-02-11 09:03:07.351094",
+ "modified": "2026-02-13 09:04:34.277807",
  "modified_by": "Administrator",
  "module": "PO Limiter",
  "name": "User PO Limit",
